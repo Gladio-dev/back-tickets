@@ -1,6 +1,6 @@
 package com.group.artifName.services;
 
-import com.group.artifName.dtos.TicketRequest;
+import com.group.artifName.dtos.TicketDto;
 import com.group.artifName.entities.Role;
 import com.group.artifName.entities.Ticket;
 import com.group.artifName.entities.TicketStatus;
@@ -21,13 +21,14 @@ public class TicketService {
     }
 
     // 1. Crear un ticket (Asociándolo al usuario que inició sesión)
-    public Ticket createTicket(TicketRequest request, User user) {
+    public Ticket createTicket(TicketDto request, User user) {
         Ticket ticket = new Ticket();
         ticket.setTitle(request.getTitle());
         ticket.setDescription(request.getDescription());
         ticket.setStatus(TicketStatus.ABIERTO); // Todo ticket nuevo empieza ABIERTO
         ticket.setCreatedAt(LocalDateTime.now());
         ticket.setUser(user); // Vinculamos el ticket con el usuario
+        ticket.setArea(request.getArea());
 
         return ticketRepository.save(ticket);
     }

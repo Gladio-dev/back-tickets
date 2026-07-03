@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import io.jsonwebtoken.io.Decoders;
 
 import java.security.Key;
 import java.util.Date;
@@ -21,16 +22,19 @@ public class JwtService {
     private String secretKey;
 
     // 100 años en milisegundos. La 'L' fuerza a Java a usar un formato de número gigante (Long)
-    private final long JWT_EXPIRATION = 100L * 365 * 24 * 60 * 60 * 1000;
+    private final long JWT_EXPIRATION = 6L * 24 * 60 * 60 * 1000;
 
     // Obtener la llave de firmado segura
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(secretKey.getBytes());
+        // Antes: secretKey.getBytes() (Lo lee como texto plano de 64 bytes)
+        // Ahora: Decoders.BASE64.decode(secretKey) (Lo lee como Hex y lo convierte a 32 bytes reales)
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }
 
     // 1. GENERAR EL TOKEN
     public String generateToken(String email, String role) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("mail",email);
         claims.put("role", role); // Guardamos el rol dentro del token
 
         return Jwts.builder()
@@ -44,6 +48,7 @@ public class JwtService {
 
     // 2. EXTRAER EL EMAIL DEL TOKEN
     public String extractEmail(String token) {
+
         return extractClaim(token, Claims::getSubject);
     }
 

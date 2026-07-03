@@ -27,11 +27,18 @@ public class Ticket {
     @Column(nullable = false)
     private TicketStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Area area;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = true)
     private LocalDateTime assignedAt;
+
+    @Column(nullable = true)
+    private LocalDateTime solvedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assignedTo_id", nullable = true)

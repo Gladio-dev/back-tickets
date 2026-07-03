@@ -1,9 +1,10 @@
 package com.group.artifName.dtos;
 
 import jakarta.persistence.*;
-import com.group.artifName.entities.Role;
+import lombok.Data;
 
-public class Userdto {
+@Data
+public class UserDto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // ID autoincremental (1, 2, 3...)
     private Long id;
@@ -13,5 +14,5 @@ public class Userdto {
 
     @Enumerated(EnumType.STRING) // Guarda el rol en la BD como texto ("USER", "ADMIN")
     @Column(nullable = false)
-    private Role role ;
+    private String role ;
 }

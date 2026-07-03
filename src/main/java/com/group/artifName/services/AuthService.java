@@ -1,12 +1,15 @@
 package com.group.artifName.services;
 
-import com.group.artifName.dtos.LoginRequest;
-import com.group.artifName.dtos.RegisterRequest;
+import com.group.artifName.dtos.LoginDto;
+import com.group.artifName.dtos.RegisterDto;
 import com.group.artifName.entities.Role;
 import com.group.artifName.entities.User;
 import com.group.artifName.repositories.UserRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.group.artifName.services.JwtService;
 
 import java.util.Optional;
 
@@ -15,14 +18,16 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     // Inyección de dependencias por constructor (Buena práctica)
     public AuthService(UserRepository userRepository, JwtService jwtService) {
         this.userRepository = userRepository;
+        this.jwtService = jwtService;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    public User register(RegisterRequest request) {
+    public User register(RegisterDto request) {
         // 1. Validar si el email ya existe
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("El correo ya está registrado");
@@ -49,7 +54,7 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    public User login(LoginRequest request) {
+    public User login(LoginDto request) {
         // 1. Buscar si el usuario existe
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Credenciales incorrectas"));
@@ -61,5 +66,27 @@ public class AuthService {
 
         // Si todo está bien, retornamos el usuario autenticado
         return user;
+    }
+
+    // Método utilitario privado para extraer y validar el usuario desde la cookie
+    public User getAuthenticatedUser(HttpServletRequest request) {
+        // A. Buscar la cookie AUTH_TOKEN
+        String token = null;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("AUTH_TOKEN".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        // B. Si la cookie no existe, denegar acceso
+        if (token == null || !jwtService.isTokenValid(token)) {
+            throw new RuntimeException("Acceso denegado: Token inválido o no proporcionado");
+        }
+        // C. Extraer el email del token y buscar al usuario en la BD
+        String email = jwtService.extractEmail(token);
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
 }
