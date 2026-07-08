@@ -25,4 +25,7 @@ public class User {
     @Enumerated(EnumType.STRING) // Guarda el rol en la BD como texto ("USER", "ADMIN")
     @Column(nullable = false)
     private Role role;
+
+    @Column(nullable = false)
+    private String company;
 }
