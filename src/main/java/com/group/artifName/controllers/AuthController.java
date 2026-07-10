@@ -107,7 +107,7 @@ public class AuthController {
         return ResponseEntity.ok(res);
     }
 
-    @GetMapping("/verify")
+    @GetMapping("/session")
     public ResponseEntity<?> verify(HttpServletRequest request){
         try {
             User logedUser = authService.getAuthenticatedUser(request); // Autenticación automática por cookie
