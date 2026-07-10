@@ -39,7 +39,7 @@ public class AuthController {
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterDto userRegister, HttpServletRequest request) {
         try {
             User loggedUser = authService.getAuthenticatedUser(request); // Autenticación automática por cookie
-            if (userService.isAdmin(loggedUser)){
+            if (!userService.isAdmin(loggedUser)){
                 Map<String,String> err = new HashMap<>();
                 err.put("error","not admin");
                 err.put("message","Solo administradores pueden registrar usuarios");
@@ -62,9 +62,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginDto logitDto, HttpServletResponse response) {
+    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginDto loginDto, HttpServletResponse response) {
         try {
-            User loggedUser = authService.login(logitDto);
+            User loggedUser = authService.login(loginDto);
 
             // 1. GENERAR EL JWT REAL CON EL EMAIL Y EL ROL
             String jwtToken = jwtService.generateToken(loggedUser.getEmail(), loggedUser.getRole().name());
@@ -139,7 +139,7 @@ public class AuthController {
                 ));
             }
             // 2. Resetear contraseña
-            authService.resetPasswordToDefault(loggedUser, changeDto.getNewPassword());
+            authService.changePassword(loggedUser, changeDto.getNewPassword());
 
             // 3. Respuesta exitosa
             return ResponseEntity.ok(Map.of(
@@ -153,12 +153,12 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/restart_password")
+    @PostMapping("/reset_password")
     public ResponseEntity<?> restartPassword(@Valid @RequestBody ResetDto resetDto, HttpServletRequest request) {
         try {
             // 1. Validar credenciales
             User loggedUser = authService.getAuthenticatedUser(request);
-            Optional<User> userToReset = userService.finduserByMail(resetDto.getEmail());
+
 
             if (loggedUser.getRole() != Role.ADMIN) {
                 Map<String, String> err = new HashMap<>();
@@ -166,10 +166,14 @@ public class AuthController {
                 err.put("message", "Solo un administrador puede resetear contraseñas");
                 return ResponseEntity.badRequest().body(err);
             }
-
+            Optional<User> userToReset = userService.finduserByMail(resetDto.getEmail());
             // 2. Resetear contraseña a 12345
-
-            authService.resetPasswordToDefault(loggedUser, "123456");
+            if (userToReset.isEmpty()) {
+                return ResponseEntity.ok(Map.of(
+                        "message", "usuario no existe"
+                ));
+            }
+            authService.changePassword(userToReset.get(), "123456");
             // 3. Respuesta exitosa
             return ResponseEntity.ok(Map.of(
                     "message", "Contraseña restablecida"

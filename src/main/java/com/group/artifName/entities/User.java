@@ -26,6 +26,9 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String company;
+
+    @Column(nullable = true)
+    private String name;
 }

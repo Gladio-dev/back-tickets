@@ -39,6 +39,7 @@ public class AuthService {
         user.setEmail(request.getEmail());
         // BCrypt transforma "123456" en algo ilegible como "$2a$10$vX..." por seguridad
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setCompany(request.getCompany());
 
         // 3. Asignar el rol (Si no viene un rol válido, por defecto es USER)
         try {
@@ -92,7 +93,7 @@ public class AuthService {
     }
 
     @Transactional
-    public boolean resetPasswordToDefault(User user, String newPassword) {
+    public boolean changePassword(User user, String newPassword) {
         // 1. Hashear la nueva contraseña
         String hashedPassword = passwordEncoder.encode(newPassword);
 

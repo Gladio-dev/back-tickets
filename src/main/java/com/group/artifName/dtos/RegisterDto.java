@@ -17,4 +17,7 @@ public class RegisterDto {
 
     // Dejamos que mande el rol por si desde Next.js registras tipos distintos de usuarios
     private String role;
+
+    @NotBlank
+    private String company;
 }
