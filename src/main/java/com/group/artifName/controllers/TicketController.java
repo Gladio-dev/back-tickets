@@ -119,35 +119,29 @@ public class TicketController {
             return ResponseEntity.status(401).body(res);
         }
     }
-
+    // create message on ticket
     @PostMapping("/{ticketId}/messages")
     public ResponseEntity<?> createMessage(
             @PathVariable Long ticketId,
             @Valid @RequestBody CreateTicketMessageRequest request,
             HttpServletRequest httpRequest
     ) {
-
         try {
-
             User loggedUser = authService.getAuthenticatedUser(httpRequest);
-
             TicketMessage message = ticketMessageService.createMessage(
                     ticketId,
                     loggedUser,
                     request
             );
-
             return ResponseEntity.ok(message);
-
         } catch (Exception e) {
-
             return ResponseEntity.badRequest().body(
                     Map.of("error", e.getMessage())
             );
 
         }
     }
-
+    // GEt TICKET MESSAGES
     @GetMapping("/{ticketId}/messages")
     public ResponseEntity<?> getMessages(
             @PathVariable Long ticketId
@@ -160,8 +154,6 @@ public class TicketController {
             return ResponseEntity.badRequest().body(
                     Map.of("error", e.getMessage())
             );
-
         }
     }
-
 }

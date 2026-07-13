@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Permite registro y login sin token
                         .requestMatchers("/api/tickets/**").permitAll()
+                        .requestMatchers("/api/users/**").permitAll()
                         .anyRequest().authenticated()               // Cualquier otra ruta requerirá inicio de sesión
                 );
 

@@ -43,4 +43,33 @@ public class UserService {
     public List<User> getAllAdmins() {
         return userRepository.findByRole(Role.ADMIN);
     }
+    public List<User> getAllUsers() {return userRepository.findAll();}
+
+    public User makeAdmin(Long id){
+        try {
+            Optional<User> user = userRepository.findById(id);
+            if (user.isEmpty()){
+                return null;
+            }
+            User finalUser = user.get();
+            finalUser.setRole(Role.ADMIN);
+            return userRepository.save(finalUser);
+        }catch(Exception e) {
+            throw new RuntimeException("Error al cambiar tipo de usuario");
+        }
+    }
+
+    public User quitAdmin(Long id){
+        try {
+            Optional<User> user = userRepository.findById(id);
+            if (user.isEmpty()){
+                return null;
+            }
+            User finalUser = user.get();
+            finalUser.setRole(Role.USER);
+            return userRepository.save(finalUser);
+        }catch(Exception e) {
+            throw new RuntimeException("Error al cambiar tipo de usuario");
+        }
+    }
 }

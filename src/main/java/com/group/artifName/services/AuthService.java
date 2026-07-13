@@ -34,24 +34,17 @@ public class AuthService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("El correo ya está registrado");
         }
-
         // 2. Crear el nuevo usuario y encriptar su contraseña
         User user = new User();
         user.setEmail(request.getEmail());
         // BCrypt transforma "123456" en algo ilegible como "$2a$10$vX..." por seguridad
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode("123456"));
         user.setCompany(request.getCompany());
+        user.setName(request.getName());
 
-        // 3. Asignar el rol (Si no viene un rol válido, por defecto es USER)
-        try {
-            if (request.getRole() != null) {
-                user.setRole(Role.valueOf(request.getRole().toUpperCase()));
-            } else {
-                user.setRole(Role.USER);
-            }
-        } catch (IllegalArgumentException e) {
-            user.setRole(Role.USER); // Sí mandan un rol que no existe, lo hacemos USER
-        }
+        // 3. Asignar el rol
+        user.setRole(Role.USER);
+
 
         // 4. Guardar en la base de datos
         return userRepository.save(user);

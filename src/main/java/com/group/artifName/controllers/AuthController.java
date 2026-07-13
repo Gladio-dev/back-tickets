@@ -50,6 +50,7 @@ public class AuthController {
             Map<String, String> response = new HashMap<>();
             response.put("message", "Usuario registrado exitosamente");
             response.put("email", userRegister.getEmail());
+            response.put("nombre", userRegister.getName());
 
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {

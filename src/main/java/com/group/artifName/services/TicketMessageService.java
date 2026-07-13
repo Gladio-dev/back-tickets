@@ -39,19 +39,10 @@ public class TicketMessageService {
 
         return ticketMessageRepository.save(message);
     }
-    public List<TicketMessageResponse> getMessagesByTicket(Long ticketId) {
+    public List<TicketMessage> getMessagesByTicket(Long ticketId) {
 
-        return ticketMessageRepository
-                .findByTicketIdOrderByCreatedAtAsc(ticketId)
-                .stream()
-                .map(message -> new TicketMessageResponse(
-                        message.getId(),
-                        message.getContent(),
-                        message.getCreatedAt(),
-                        message.getSender().getId(),
-                        message.getSender().getName()
-                ))
-                .toList();
+        return ticketMessageRepository.findByTicketIdOrderByCreatedAtAsc(ticketId);
+
     }
 
 }

@@ -12,12 +12,9 @@ public class RegisterDto {
     @Email(message = "El formato del correo electrónico no es válido")
     private String email;
 
-    @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
-    private String password;
-
-    // Dejamos que mande el rol por si desde Next.js registras tipos distintos de usuarios
-    private String role;
-
     @NotBlank
     private String company;
+
+    @NotBlank
+    private String name;
 }
