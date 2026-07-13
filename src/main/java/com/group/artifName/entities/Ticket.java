@@ -31,11 +31,17 @@ public class Ticket {
     @Column(nullable = false)
     private Area area;
 
+    @Column(nullable = true)
+    private String type;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = true)
     private LocalDateTime assignedAt;
+
+    @Column(nullable = true)
+    private LocalDateTime inProgressAt;
 
     @Column(nullable = true)
     private LocalDateTime solvedAt;

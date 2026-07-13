@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,5 +37,10 @@ public class UserService {
     }
     public Optional <User> finduserByMail(String mail){
         return userRepository.findByEmail(mail);
+    }
+
+
+    public List<User> getAllAdmins() {
+        return userRepository.findByRole(Role.ADMIN);
     }
 }

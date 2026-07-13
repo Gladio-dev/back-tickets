@@ -1,5 +1,6 @@
 package com.group.artifName.controllers;
 
+import com.group.artifName.dtos.AssignTicketDto;
 import com.group.artifName.dtos.CreateTicketMessageRequest;
 import com.group.artifName.dtos.TicketDto;
 import com.group.artifName.dtos.UpdateTicketStatusDto;
@@ -57,7 +58,7 @@ public class TicketController {
         }
     }
 
-    // 2. LISTAR TICKETS SEGÚN ROL
+    // 2. LISTAR TODOS LOS TICKETS SEGÚN USUARIO
     @GetMapping
     public ResponseEntity<?> getAll(HttpServletRequest httpRequest) {
         try {
@@ -68,7 +69,7 @@ public class TicketController {
             Map<String,String> res = new HashMap<>();
             res.put("message",e.getMessage());
 
-            return ResponseEntity.status(401).body("res");
+            return ResponseEntity.status(401).body(res);
         }
     }
 
@@ -83,6 +84,39 @@ public class TicketController {
             return ResponseEntity.ok(updatedTicket);
         } catch (RuntimeException e) {
             return ResponseEntity.status(401).body(e.getMessage());
+        }
+    }
+
+    //ASSIGN TICKET TO
+    @PutMapping("/{id}/assigned")
+    public ResponseEntity<?> assignticket(@PathVariable Long id,
+                                          @Valid @RequestBody AssignTicketDto request,
+                                          HttpServletRequest httpRequest) {
+        try {
+            User user = authService.getAuthenticatedUser(httpRequest);
+            Ticket updatedTicket = ticketService.assignTicket(id, request.getId(), user);
+            return ResponseEntity.ok(updatedTicket);
+        } catch (RuntimeException e) {
+            Map<String,String> res = new HashMap<>();
+            res.put("message",e.getMessage());
+
+            return ResponseEntity.status(401).body(res);
+        }
+    }
+
+    //IN PROCESS TICKET
+    @PutMapping("/{id}/inprocess")
+    public ResponseEntity<?> assignticket(@PathVariable Long id,
+                                          HttpServletRequest httpRequest) {
+        try {
+            User user = authService.getAuthenticatedUser(httpRequest);
+            Ticket updatedTicket = ticketService.inProgressTicket(id, user);
+            return ResponseEntity.ok(updatedTicket);
+        } catch (RuntimeException e) {
+            Map<String,String> res = new HashMap<>();
+            res.put("message",e.getMessage());
+
+            return ResponseEntity.status(401).body(res);
         }
     }
 
@@ -118,15 +152,11 @@ public class TicketController {
     public ResponseEntity<?> getMessages(
             @PathVariable Long ticketId
     ) {
-
         try {
-
             return ResponseEntity.ok(
                     ticketMessageService.getMessagesByTicket(ticketId)
             );
-
         } catch (Exception e) {
-
             return ResponseEntity.badRequest().body(
                     Map.of("error", e.getMessage())
             );

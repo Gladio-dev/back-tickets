@@ -13,12 +13,11 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.boot.webmvc.autoconfigure.WebMvcProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/auth") // Todas las rutas empezarán con http://localhost:8080/api/auth
@@ -184,6 +183,12 @@ public class AuthController {
                     "error", e.getMessage()
             ));
         }
+    }
+
+    @GetMapping("/admins")
+    public ResponseEntity<List<User>> getAdmins() {
+        List<User> admins = userService.getAllAdmins();
+        return ResponseEntity.ok(admins);
     }
 
 

@@ -16,4 +16,7 @@ public class TicketDto {
 
     @NotNull(message = "El área del ticket es obligatoria")
     private Area area;
+
+    @NotNull(message = "El tipo de ticket es obligatorio")
+    private String type;
 }
