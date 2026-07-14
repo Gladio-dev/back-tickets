@@ -52,6 +52,7 @@ public class AuthService {
 
     public User login(LoginDto request) {
         // 1. Buscar si el usuario existe
+        System.out.println("Entró al login");
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Credenciales incorrectas"));
 
