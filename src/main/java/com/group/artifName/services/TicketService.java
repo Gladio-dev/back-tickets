@@ -48,6 +48,17 @@ public class TicketService {
         }
     }
 
+    // 2. Obtener tickets por ID
+    public Ticket getTicket(Long id) {
+        // REGLA: Si es ADMIN, ve todos. Si es USER, solo ve los suyos.
+    Optional<Ticket> ticket = ticketRepository.findById(id);
+
+    if (ticket.isPresent()){
+        return ticket.get();
+    }
+      throw new RuntimeException("Ticket no encontrado");
+    }
+
     // 3. Cambiar de etapa (Solo permitido para ADMIN)
     public Ticket updateTicketStatus(Long ticketId, String newStatusStr, User user) {
         // REGLA DE SEGURIDAD: Validar que sea ADMIN
@@ -122,5 +133,28 @@ public class TicketService {
 
     }
 
+    public Ticket solveTicket(Long ticketId, User user) {
+
+        // Buscar el ticket
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new RuntimeException("Ticket no encontrado"));
+        try {
+
+            if (ticket.getAssignedTo() == null){
+                throw new IllegalArgumentException("El ticket no ha sido asignado");
+            }
+            // Validar y mapear el string al Enum
+//            if (user.getId() != ticket.getAssignedTo().getId()) {
+//                throw new IllegalArgumentException();
+//            }
+            ticket.setStatus(TicketStatus.RESUELTO);
+            ticket.setSolvedAt(LocalDateTime.now());
+
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("No se pudo resolver el ticket seleccionado");
+        }
+        return ticketRepository.save(ticket);
+
+    }
 
 }

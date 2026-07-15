@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
@@ -12,4 +13,5 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     // Spring leerá esto y generará automáticamente un:
     // SELECT * FROM tickets WHERE user_id = ?
     List<Ticket> findByUserId(Long userId);
+    Optional<Ticket> findById(Long userId);
 }

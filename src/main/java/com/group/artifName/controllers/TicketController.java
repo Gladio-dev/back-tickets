@@ -57,7 +57,21 @@ public class TicketController {
             return ResponseEntity.status(401).body(e.getMessage());
         }
     }
-
+    //OBTENER UN TICKET POR ID
+    @GetMapping("/{ticketId}")
+    public ResponseEntity<?> getTicket(
+            @PathVariable Long ticketId
+    ) {
+        try {
+            return ResponseEntity.ok(
+                    ticketService.getTicket(ticketId)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("error", e.getMessage())
+            );
+        }
+    }
     // 2. LISTAR TODOS LOS TICKETS SEGÚN USUARIO
     @GetMapping
     public ResponseEntity<?> getAll(HttpServletRequest httpRequest) {
@@ -119,6 +133,22 @@ public class TicketController {
             return ResponseEntity.status(401).body(res);
         }
     }
+    //IN PROCESS TICKET
+    @PutMapping("/{id}/solve")
+    public ResponseEntity<?> solveticket(@PathVariable Long id,
+                                          HttpServletRequest httpRequest) {
+        try {
+            User user = authService.getAuthenticatedUser(httpRequest);
+            Ticket updatedTicket = ticketService.inProgressTicket(id, user);
+            return ResponseEntity.ok(updatedTicket);
+        } catch (RuntimeException e) {
+            Map<String,String> res = new HashMap<>();
+            res.put("message",e.getMessage());
+
+            return ResponseEntity.status(401).body(res);
+        }
+    }
+
     // create message on ticket
     @PostMapping("/{ticketId}/messages")
     public ResponseEntity<?> createMessage(
@@ -156,4 +186,9 @@ public class TicketController {
             );
         }
     }
+
+
+
+
+
 }
