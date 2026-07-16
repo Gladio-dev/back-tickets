@@ -23,6 +23,9 @@ public class Ticket {
     @Column(nullable = false, columnDefinition = "TEXT") // "TEXT" permite descripciones largas
     private String description;
 
+    @Column(nullable = true, columnDefinition = "TEXT") // "TEXT" permite descripciones largas
+    private String solution;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TicketStatus status;

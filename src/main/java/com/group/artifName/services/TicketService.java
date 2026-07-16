@@ -34,6 +34,7 @@ public class TicketService {
         ticket.setCreatedAt(LocalDateTime.now());
         ticket.setUser(user); // Vinculamos el ticket con el usuario
         ticket.setArea(request.getArea());
+        ticket.setType(request.getType());
 
         return ticketRepository.save(ticket);
     }
@@ -133,25 +134,25 @@ public class TicketService {
 
     }
 
-    public Ticket solveTicket(Long ticketId, User user) {
+    public Ticket solveTicket(Long ticketId, User user, String message) {
 
         // Buscar el ticket
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new RuntimeException("Ticket no encontrado"));
         try {
-
             if (ticket.getAssignedTo() == null){
                 throw new IllegalArgumentException("El ticket no ha sido asignado");
             }
-            // Validar y mapear el string al Enum
-//            if (user.getId() != ticket.getAssignedTo().getId()) {
-//                throw new IllegalArgumentException();
-//            }
+            if (!(ticket.getStatus() == TicketStatus.EN_PROCESO)){
+                throw new IllegalArgumentException("El ticket no ha iniciado proceso");
+            }
+
             ticket.setStatus(TicketStatus.RESUELTO);
             ticket.setSolvedAt(LocalDateTime.now());
+            ticket.setSolution(message);
 
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("No se pudo resolver el ticket seleccionado");
+            throw new RuntimeException("No se pudo resolver el ticket seleccionado, "+e.getMessage());
         }
         return ticketRepository.save(ticket);
 

@@ -1,9 +1,6 @@
 package com.group.artifName.controllers;
 
-import com.group.artifName.dtos.AssignTicketDto;
-import com.group.artifName.dtos.CreateTicketMessageRequest;
-import com.group.artifName.dtos.TicketDto;
-import com.group.artifName.dtos.UpdateTicketStatusDto;
+import com.group.artifName.dtos.*;
 import com.group.artifName.entities.Ticket;
 import com.group.artifName.entities.TicketMessage;
 import com.group.artifName.entities.User;
@@ -133,13 +130,14 @@ public class TicketController {
             return ResponseEntity.status(401).body(res);
         }
     }
-    //IN PROCESS TICKET
+    //SOLVE TICKET
     @PutMapping("/{id}/solve")
     public ResponseEntity<?> solveticket(@PathVariable Long id,
+                                         @Valid @RequestBody TicketSolvedMessage request,
                                           HttpServletRequest httpRequest) {
         try {
             User user = authService.getAuthenticatedUser(httpRequest);
-            Ticket updatedTicket = ticketService.inProgressTicket(id, user);
+            Ticket updatedTicket = ticketService.solveTicket(id, user, request.getMessage());
             return ResponseEntity.ok(updatedTicket);
         } catch (RuntimeException e) {
             Map<String,String> res = new HashMap<>();
