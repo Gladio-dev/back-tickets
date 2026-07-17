@@ -117,6 +117,7 @@ public class AuthController {
             response.put("message", "Sesión iniciada");
             response.put("email", logedUser.getEmail());
             response.put("role", logedUser.getRole().name());
+            response.put("Rpass", logedUser.getForceNewPassword().toString());
             return ResponseEntity.ok(response);
 
         } catch (RuntimeException e) {

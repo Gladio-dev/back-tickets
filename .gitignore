@@ -33,4 +33,3 @@ build/
 .vscode/
 # Variables de entorno
 application-dev.properties
-application-prod.properties
