@@ -7,12 +7,16 @@ import com.group.artifName.entities.User;
 import com.group.artifName.repositories.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.group.artifName.services.JwtService;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -41,6 +45,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode("123456"));
         user.setCompany(request.getCompany());
         user.setName(request.getName());
+        user.setNeedNewPassword(true);
 
         // 3. Asignar el rol
         user.setRole(Role.USER);
@@ -101,7 +106,14 @@ public class AuthService {
         return true;
     }
 
+    public HttpServletResponse logOut(HttpServletResponse response) {
 
+        Cookie cookie = new Cookie("AUTH_TOKEN", null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+        return response;
+    }
 
 }
 

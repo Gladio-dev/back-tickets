@@ -65,7 +65,6 @@ public class AuthController {
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginDto loginDto, HttpServletResponse response) {
         try {
             User loggedUser = authService.login(loginDto);
-
             // 1. GENERAR EL JWT REAL CON EL EMAIL Y EL ROL
             String jwtToken = jwtService.generateToken(loggedUser.getEmail(), loggedUser.getRole().name());
 
@@ -77,7 +76,7 @@ public class AuthController {
             authCookie.setSecure(true);    // Cambiar a 'true' en producción (HTTPS)
             authCookie.setPath("/");
 
-// 7 días El navegador guardará la cookie en el disco duro y no se borrará al apagar la PC
+            // 7 días El navegador guardará la cookie en el disco duro y no se borrará al apagar la PC
             authCookie.setMaxAge(6 * 24 * 60 * 60);
             // 3. Inyectamos la cookie en la respuesta HTTP
             response.addCookie(authCookie);
@@ -99,10 +98,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
         // Solo eliminar cookie
-        Cookie cookie = new Cookie("AUTH_TOKEN", null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        response.addCookie(cookie);
+        response =authService.logOut(response);
         Map<String,String> res = new HashMap<>();
         res.put("message","sesión cerrada correctamente");
         return ResponseEntity.ok(res);
@@ -135,7 +131,9 @@ public class AuthController {
     }
 
     @PostMapping("/change_password")
-    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangeDto changeDto, HttpServletRequest request) {
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangeDto changeDto,
+                                            HttpServletRequest request,
+                                            HttpServletResponse response) {
         try {
             // 1. Validar credenciales
             User loggedUser = authService.getAuthenticatedUser(request);
@@ -146,10 +144,10 @@ public class AuthController {
             }
             // 2. Resetear contraseña
             authService.changePassword(loggedUser, changeDto.getNewPassword());
-
+            response = authService.logOut(response);
             // 3. Respuesta exitosa
             return ResponseEntity.ok(Map.of(
-                    "message", "Contraseña cambiada correctamente"
+                    "message", "Contraseña cambiada correctamente, inicia sesion con tu nueva contraseña"
             ));
 
         } catch (Exception e) {
