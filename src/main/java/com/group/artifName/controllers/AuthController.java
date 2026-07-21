@@ -1,11 +1,10 @@
 package com.group.artifName.controllers;
 
 import com.group.artifName.dtos.*;
+import com.group.artifName.entities.AccountToken;
 import com.group.artifName.entities.Role;
 import com.group.artifName.entities.User;
-import com.group.artifName.services.AuthService;
-import com.group.artifName.services.JwtService;
-import com.group.artifName.services.UserService;
+import com.group.artifName.services.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,12 +22,16 @@ public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService; // 1. Agregamos la variable
     private final UserService userService;
+    private final AccountTokenService accountTokenService;
+    private final EmailService emailService;
 
 
-    public AuthController(AuthService authService, JwtService jwtService, UserService userService) {
+    public AuthController(AuthService authService, JwtService jwtService, UserService userService, AccountTokenService accountTokenService, EmailService emailService) {
         this.authService = authService;
         this.jwtService = jwtService;
         this.userService = userService;
+        this.accountTokenService = accountTokenService;
+        this.emailService = emailService;
     }
 
     @PostMapping("/register")
@@ -42,6 +45,9 @@ public class AuthController {
                 return ResponseEntity.badRequest().body(err);
             }
             User registeredUser = authService.register(userRegister);
+            AccountToken accountToken = accountTokenService.registerUser(registeredUser);
+            String link = createLink(accountToken);
+            emailService.sendActivationEmail(registeredUser,link);
 
             // Creamos una respuesta bonita en formato JSON
             Map<String, String> response = new HashMap<>();
@@ -56,6 +62,13 @@ public class AuthController {
             errorResponse.put("error", e.getMessage());
             return ResponseEntity.badRequest().body(errorResponse);
         }
+    }
+
+    private String createLink(AccountToken accountToken) {
+
+
+
+        return "";
     }
 
     @PostMapping("/login")
@@ -195,6 +208,18 @@ public class AuthController {
 
     @PutMapping("/activate")
     public ResponseEntity<?> activateUser(@Valid @RequestBody PasswordDto passwordDto) {
+        try {
+            User user = authService.activateUser(passwordDto.getUuid(), passwordDto.getPassword());
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @PutMapping("/reset")
+    public ResponseEntity<?> resetUser(@Valid @RequestBody PasswordDto passwordDto) {
         try {
             User user = authService.activateUser(passwordDto.getUuid(), passwordDto.getPassword());
             return ResponseEntity.ok(user);

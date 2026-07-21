@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Activa tu cuenta</title>
+</head>
+
+<body style="margin:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+
+<table width="100%" cellpadding="40">
+    <tr>
+        <td align="center">
+
+            <table width="600"
+                   style="background:white;border-radius:10px;padding:40px;">
+
+                <tr>
+                    <td>
+
+                        <h2>¡Bienvenido!</h2>
+
+                        <p>
+                            Tu cuenta ha sido creada correctamente.
+                        </p>
+
+                        <p>
+                            Para comenzar únicamente debes activar tu cuenta.
+                        </p>
+
+                        <p style="text-align:center;margin:40px;">
+
+                            <a th:href="${activationLink}"
+                               style="
+        background:#2563eb;
+        color:white;
+        padding:15px 30px;
+        text-decoration:none;
+        border-radius:8px;
+        font-weight:bold;">
+
+                                Activar cuenta
+
+                            </a>
+
+                        </p>
+
+                        <p>
+                            Si el botón no funciona, copia el siguiente enlace:
+                        </p>
+
+                        <p>
+                            <span th:text="${activationLink}"></span>
+                        </p>
+
+                        <p>
+                            Este enlace expirará en 24 horas.
+                        </p>
+
+                    </td>
+                </tr>
+
+            </table>
+
+        </td>
+    </tr>
+</table>
+
+</body>
+
+</html>

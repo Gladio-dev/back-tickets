@@ -1,5 +1,6 @@
 package com.group.artifName;
 
+import com.group.artifName.services.EmailService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,10 +15,21 @@ public class ArtifNameApplication {
 	}
 
 	@Bean
-	CommandLineRunner init(BCryptPasswordEncoder encoder) {
+	CommandLineRunner init(
+			BCryptPasswordEncoder encoder,
+			EmailService emailService
+	) {
+
 		return args -> {
-//			System.out.println(encoder.encode("123456"));
+
+
+			emailService.sendActivationEmail(null,"www.google.com");
+//			emailService.sendTestEmail("alexis.castillo@rseguridad.com");
+//			emailService.testAuthentication();
+//			emailService.testToken();
 			System.out.println("The App is running");
+
+
 		};
 	}
 }

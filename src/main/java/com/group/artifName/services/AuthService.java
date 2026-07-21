@@ -21,7 +21,7 @@ import java.util.*;
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final AccountTokenService accountTokenService;
+
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -31,7 +31,7 @@ public class AuthService {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
-        this.accountTokenService = accountTokenService;
+
     }
 
     public User register(RegisterDto request) {
@@ -50,7 +50,7 @@ public class AuthService {
         user.setRole(Role.USER);
         // 4. Guardar en la base de datos
         User created = userRepository.save(user);
-        AccountToken accountToken = accountTokenService.registerUser(created);
+
 
 
         return created;
@@ -124,21 +124,15 @@ public class AuthService {
         return response;
     }
 
-
     @Transactional
     public User activateUser(UUID uuid, String password) {
-
         User user = accountTokenService.consumeActivationToken(uuid);
-
         if (user.getActive()) {
             throw new RuntimeException("La cuenta ya se encuentra activada.");
         }
-
         user.setPassword(passwordEncoder.encode(password));
         user.setActive(true);
-
         return userRepository.save(user);
     }
-
 }
 

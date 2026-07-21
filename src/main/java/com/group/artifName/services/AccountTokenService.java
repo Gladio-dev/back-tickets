@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.mail.javamail.JavaMailSender;
 
 @Service
 public class AccountTokenService {
@@ -31,9 +32,12 @@ public class AccountTokenService {
         }
         accountToken.setType(TokenType.ACTIVATE);
         accountToken.setCreatedAt(LocalDateTime.now());
-        accountToken.setExpiresAt(LocalDateTime.now().plusMinutes(15));
+        accountToken.setExpiresAt(LocalDateTime.now().plusDays(3));
         accountToken.setUsed(false);
         //Mandar correo de activación
+
+
+
         return accountTokenRepository.save(accountToken);
     }
 
@@ -49,7 +53,7 @@ public class AccountTokenService {
         }
         accountToken.setType(TokenType.RESET);
         accountToken.setCreatedAt(LocalDateTime.now());
-        accountToken.setExpiresAt(LocalDateTime.now().plusMinutes(15));
+        accountToken.setExpiresAt(LocalDateTime.now().plusHours(24));
         accountToken.setUsed(false);
 // FUNCION PARA ENVIAR EL CORREO
         return accountTokenRepository.save(accountToken);
@@ -57,28 +61,37 @@ public class AccountTokenService {
 
     @Transactional
     public User consumeActivationToken(UUID tokenUuid) {
-
         AccountToken token = accountTokenRepository.findByToken(tokenUuid)
                 .orElseThrow(() -> new RuntimeException("Token de activación no encontrado."));
-
-        if (token.getType() != TokenType.ACTIVATE) {
-            throw new RuntimeException("El token no es de activación.");
-        }
-
-        if (token.isUsed()) {
-            throw new RuntimeException("El token ya fue utilizado.");
-        }
-
+//        if (token.getType() != TokenType.ACTIVATE) {
+//            throw new RuntimeException("El token no es de activación.");
+//        }
         if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("El token ha expirado.");
         }
-
-        token.setUsed(true);
-        token.setUsedAt(LocalDateTime.now());
-
-        return token.getUser();
+        User user = token.getUser();
+        // Eliminar el token en lugar de marcarlo como usado
+        accountTokenRepository.delete(token);
+        return user;
     }
 
+    @Transactional
+    public User consumeResetToken(UUID tokenUuid) {
+        AccountToken token = accountTokenRepository.findByToken(tokenUuid)
+                .orElseThrow(() -> new RuntimeException("Token de activación no encontrado."));
+        if (token.getType() != TokenType.RESET) {
+            throw new RuntimeException("El token no es de reseteo.");
+        }
+        if (token.isUsed()) {
+            throw new RuntimeException("El token ya fue utilizado.");
+        }
+        if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("El token ha expirado.");
+        }
+        token.setUsed(true);
+        token.setUsedAt(LocalDateTime.now());
+        return token.getUser();
+    }
 
 
 
